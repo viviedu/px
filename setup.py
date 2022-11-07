@@ -74,6 +74,7 @@ setup(
     keywords = "proxy ntlm kerberos pac negotiate http",
     packages = find_packages(),
     install_requires = [
+        'basicauth',
         'futures;python_version<"3.0"',
         "keyring",
         "netaddr",

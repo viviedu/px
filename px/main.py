@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 
+import basicauth
 import getpass
 import multiprocessing
 import os
@@ -205,6 +206,10 @@ Configuration:
     Px will attach to the console and write to it even though the prompt is
     available for further commands. CTRL-C in the console will exit Px
 
+  --proxyauthbasic
+  Enables passing proxy auth details via a "Proxy-Authorization: Basic" header
+    Details are expected to be "Basic" base64 encoded as per RFC 7235
+
   --verbose  settings:verbose=
   Enable debug output. default: 0
 
@@ -217,6 +222,7 @@ Configuration:
   Generate unique log file names in current working directory
     Prevents logs from being overwritten on subsequent runs. Also useful if
     running multiple instances of Px""" % __version__
+
 
 class State:
     """Stores runtime state per process - shared across threads"""
@@ -335,7 +341,12 @@ class Proxy(httpserver.BaseHTTPRequestHandler):
 
             key = ""
             pwd = None
-            if len(State.username) != 0:
+            # Intercept Proxy-Authorization Header
+            if State.config.getint("settings", "proxyauthbasic") == 1:
+                authorization = self.headers.get('Proxy-Authorization')
+                if authorization is not None and "Basic " in authorization:
+                    key, pwd = basicauth.decode(authorization)
+            elif len(State.username) != 0:
                 key = State.username
                 pwd = keyring.get_password("Px", key)
             if len(key) == 0:
@@ -420,6 +431,8 @@ class PoolMixIn(socketserver.ThreadingMixIn):
     pool = None
 
     def process_request(self, request, client_address):
+        print("[DEBUG] client_address", client_address)
+        print("[DEBUG] request", request)
         self.pool.submit(self.process_request_thread, request, client_address)
 
     def verify_request(self, request, client_address):
@@ -751,6 +764,7 @@ def parse_config():
     cfg_float_init("settings", "socktimeout", "20.0")
     cfg_int_init("settings", "proxyreload", "60")
     cfg_int_init("settings", "foreground", "0")
+    cfg_int_init("settings", "proxyauthbasic", "0")
 
     cfg_int_init("settings", "log", "0" if State.debug is None else "1")
     if State.config.get("settings", "log") == "1" and State.debug is None:
@@ -796,6 +810,9 @@ def parse_config():
 
     if "--foreground" in sys.argv:
         cfg_int_init("settings", "foreground", "1", True)
+
+    if "--proxyauthbasic" in sys.argv:
+        cfg_int_init("settings", "proxyauthbasic", "1", True)
 
     ###
     # Dependency propagation
