@@ -17,11 +17,11 @@ warnings.filterwarnings("ignore")
 from .debug import pprint, Debug
 from .version import __version__
 
-try:
-    import psutil
-except ImportError:
-    pprint("Requires module psutil")
-    sys.exit()
+# try:
+#     import psutil
+# except ImportError:
+#     pprint("Requires module psutil")
+#     sys.exit()
 
 # Python 2.x vs 3.x support
 try:
@@ -35,7 +35,7 @@ except ImportError:
     import SocketServer as socketserver
     import urlparse
 
-    os.getppid = psutil.Process().ppid
+    # os.getppid = psutil.Process().ppid
     PermissionError = OSError
 
 # Dependencies
@@ -51,24 +51,24 @@ except ImportError:
     pprint("Requires module netaddr")
     sys.exit()
 
-try:
-    import keyring
+# try:
+#     import keyring
 
-    # Explicit imports for Nuitka
-    if sys.platform == "win32":
-        import keyring.backends.Windows
-    elif sys.platform.startswith("linux"):
-        import keyring.backends.SecretService
-        try:
-            import keyring_jeepney
-            import keyrings.alt.file
-        except:
-            pass
-    elif sys.platform == "darwin":
-        import keyring.backends.OS_X
-except ImportError:
-    pprint("Requires module keyring")
-    sys.exit()
+#     # Explicit imports for Nuitka
+#     if sys.platform == "win32":
+#         import keyring.backends.Windows
+#     elif sys.platform.startswith("linux"):
+#         import keyring.backends.SecretService
+#         try:
+#             import keyring_jeepney
+#             import keyrings.alt.file
+#         except:
+#             pass
+#     elif sys.platform == "darwin":
+#         import keyring.backends.OS_X
+# except ImportError:
+#     pprint("Requires module keyring")
+#     sys.exit()
 
 if sys.platform == "win32":
     import ctypes
@@ -335,9 +335,9 @@ class Proxy(httpserver.BaseHTTPRequestHandler):
 
             key = ""
             pwd = None
-            if len(State.username) != 0:
-                key = State.username
-                pwd = keyring.get_password("Px", key)
+            # if len(State.username) != 0:
+            #     key = State.username
+            #     pwd = keyring.get_password("Px", key)
             if len(key) == 0:
                 dprint(self.curl.easyhash + ": Using SSPI to login")
                 key = ":"
@@ -585,6 +585,7 @@ def set_username(username):
     State.username = username
 
 def set_password():
+    sys.exit()
     try:
         if len(State.username) == 0:
             pprint("domain\\username missing - specify via --username or configure in px.ini")
@@ -857,6 +858,8 @@ def parse_config():
 # Exit related
 
 def quit(checkOnly = False):
+    sys.exit()
+    return
     count = 0
     mypids = [os.getpid(), os.getppid()]
     mypath = os.path.realpath(sys.executable).lower()
@@ -1026,6 +1029,7 @@ if sys.platform == "win32":
             State.debug.stdout = State.stdout
 
     def attach_console():
+        return
         if ctypes.windll.kernel32.GetConsoleWindow() != 0:
             dprint("Already attached to a console")
             return

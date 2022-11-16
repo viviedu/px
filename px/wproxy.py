@@ -243,6 +243,7 @@ class _WproxyBase:
             return copy.deepcopy(self.servers), netloc, path
 
         if self.mode == MODE_CONFIG_PAC:
+            pass
             # Return proxy from configured PAC URL/file
             if self.pac is None:
                 # Load PAC file
