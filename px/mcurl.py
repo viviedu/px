@@ -743,7 +743,9 @@ class MCurl:
 
                 # Add this proxy to failed list and don't try again
                 with self._lock:
-                    self.failed.append(curl.proxy)
+                    # We don't want fails to poison future requests
+                    #self.failed.append(curl.proxy)
+                    pass
 
         if curl.is_connect() and curl.sock_fd is None:
             # Need sock_fd for select()
