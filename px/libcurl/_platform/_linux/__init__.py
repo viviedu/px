@@ -21,7 +21,7 @@ arch_dir = os.path.join(this_dir, arch)
 #     if DLL_PATH is None or DLL_PATH in ("", "None"):
 #         raise ImportError()
 # except ImportError:
-DLL_PATH = "libcurl.so.4"
+DLL_PATH = "libcurl.so"
 
 from ctypes  import CDLL as DLL
 from _ctypes import dlclose
