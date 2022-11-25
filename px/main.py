@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 
+import basicauth
 import getpass
 import multiprocessing
 import os
@@ -184,6 +185,10 @@ Configuration:
       Prefix SAFENO to avoid method - e.g. SAFENONTLM => ANYSAFE - NTLM
       Prefix ONLY to support only that method - e.g ONLYNTLM => ONLY + NTLM
 
+  --proxyauthbasic proxy:proxyauthbasic=
+  Uses proxy auth details via "Proxy-Authorization: Basic". 0 or 1, default: 0
+    Details are expected to be "Basic" base64 encoded as per RFC 7235
+
   --workers=  settings:workers=
   Number of parallel workers (processes). Valid integer, default: 2
 
@@ -217,6 +222,7 @@ Configuration:
   Generate unique log file names in current working directory
     Prevents logs from being overwritten on subsequent runs. Also useful if
     running multiple instances of Px""" % __version__
+
 
 class State:
     """Stores runtime state per process - shared across threads"""
@@ -335,9 +341,14 @@ class Proxy(httpserver.BaseHTTPRequestHandler):
 
             key = ""
             pwd = None
-            # if len(State.username) != 0:
-            #     key = State.username
-            #     pwd = keyring.get_password("Px", key)
+            # Intercept Proxy-Authorization Header
+            if State.config.getint("proxy", "proxyauthbasic") == 1:
+                authorization = self.headers.get('Proxy-Authorization')
+                if authorization is not None and "Basic " in authorization:
+                    key, pwd = basicauth.decode(authorization)
+            # elif len(State.username) != 0:
+            #   key = State.username
+            #   pwd = keyring.get_password("Px", key)
             if len(key) == 0:
                 dprint(self.curl.easyhash + ": Using SSPI to login")
                 key = ":"
@@ -420,6 +431,8 @@ class PoolMixIn(socketserver.ThreadingMixIn):
     pool = None
 
     def process_request(self, request, client_address):
+        print("[DEBUG] client_address", client_address)
+        print("[DEBUG] request", request)
         self.pool.submit(self.process_request_thread, request, client_address)
 
     def verify_request(self, request, client_address):
@@ -741,6 +754,7 @@ def parse_config():
     cfg_str_init("proxy", "useragent", "", set_useragent)
     cfg_str_init("proxy", "username", "", set_username)
     cfg_str_init("proxy", "auth", "", set_auth)
+    cfg_int_init("proxy", "proxyauthbasic", "0")
 
     # [settings] section
     if "settings" not in State.config.sections():
@@ -794,6 +808,9 @@ def parse_config():
 
     if "--hostonly" in sys.argv:
         cfg_int_init("proxy", "hostonly", "1", True)
+
+    if "--proxyauthbasic" in sys.argv:
+        cfg_int_init("proxy", "proxyauthbasic", "1", True)
 
     if "--foreground" in sys.argv:
         cfg_int_init("settings", "foreground", "1", True)
