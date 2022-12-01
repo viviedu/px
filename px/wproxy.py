@@ -242,8 +242,7 @@ class _WproxyBase:
             # Return proxy from environment or configuration
             return copy.deepcopy(self.servers), netloc, path
 
-        if self.mode == MODE_CONFIG_PAC:
-            pass
+        # if self.mode == MODE_CONFIG_PAC:
             # Return proxy from configured PAC URL/file
             # if self.pac is None:
             #     # Load PAC file

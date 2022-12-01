@@ -37,7 +37,7 @@ except ImportError:
     import urlparse
 
     # os.getppid = psutil.Process().ppid
-    PermissionError = OSError
+    # PermissionError = OSError
 
 # Dependencies
 try:
@@ -472,10 +472,10 @@ def print_banner():
         multiprocessing.current_process().name)
     )
 
-    if sys.platform == "win32":
-        if is_compiled() or "pythonw.exe" in sys.executable:
-            if State.config.getint("settings", "foreground") == 0:
-                detach_console()
+    # if sys.platform == "win32":
+    #     if is_compiled() or "pythonw.exe" in sys.executable:
+    #         if State.config.getint("settings", "foreground") == 0:
+                # detach_console()
 
     for section in State.config.sections():
         for option in State.config.options(section):
@@ -599,24 +599,24 @@ def set_username(username):
 
 def set_password():
     sys.exit()
-    try:
-        if len(State.username) == 0:
-            pprint("domain\\username missing - specify via --username or configure in px.ini")
-            sys.exit()
-        pprint("Setting password for '" + State.username + "'")
+    # try:
+    #     if len(State.username) == 0:
+    #         pprint("domain\\username missing - specify via --username or configure in px.ini")
+    #         sys.exit()
+    #     pprint("Setting password for '" + State.username + "'")
 
-        pwd = ""
-        while len(pwd) == 0:
-            pwd = getpass.getpass("Enter password: ")
+    #     pwd = ""
+    #     while len(pwd) == 0:
+    #         pwd = getpass.getpass("Enter password: ")
 
-        keyring.set_password("Px", State.username, pwd)
+    #     keyring.set_password("Px", State.username, pwd)
 
-        if keyring.get_password("Px", State.username) == pwd:
-            print("Saved successfully")
-    except KeyboardInterrupt:
-        print("")
+    #     if keyring.get_password("Px", State.username) == pwd:
+    #         print("Saved successfully")
+    # except KeyboardInterrupt:
+    #     print("")
 
-    sys.exit()
+    # sys.exit()
 
 def set_pac(pac):
     if pac == "":
@@ -717,9 +717,9 @@ def parse_config():
         State.debug = Debug()
         dprint = State.debug.get_print()
 
-    if sys.platform == "win32":
-        if is_compiled() or "pythonw.exe" in sys.executable:
-            attach_console()
+    # if sys.platform == "win32":
+    #     if is_compiled() or "pythonw.exe" in sys.executable:
+    #         attach_console()
 
     if "-h" in sys.argv or "--help" in sys.argv:
         pprint(HELP)
@@ -876,70 +876,70 @@ def parse_config():
 
 def quit(checkOnly = False):
     sys.exit()
-    return
-    count = 0
-    mypids = [os.getpid(), os.getppid()]
-    mypath = os.path.realpath(sys.executable).lower()
+    # return
+    # count = 0
+    # mypids = [os.getpid(), os.getppid()]
+    # mypath = os.path.realpath(sys.executable).lower()
 
-    # Add .exe for Windows
-    ext = ""
-    if sys.platform == "win32":
-        ext = ".exe"
-        _, tail = os.path.splitext(mypath)
-        if len(tail) == 0:
-            mypath += ext
-    mybin = os.path.basename(mypath)
+    # # Add .exe for Windows
+    # ext = ""
+    # if sys.platform == "win32":
+    #     ext = ".exe"
+    #     _, tail = os.path.splitext(mypath)
+    #     if len(tail) == 0:
+    #         mypath += ext
+    # mybin = os.path.basename(mypath)
 
-    for pid in sorted(psutil.pids(), reverse=True):
-        if pid in mypids:
-            continue
+    # for pid in sorted(psutil.pids(), reverse=True):
+    #     if pid in mypids:
+    #         continue
 
-        try:
-            p = psutil.Process(pid)
-            exepath = p.exe().lower()
-            if sys.platform == "win32":
-                # Set \IP to \\IP for Windows shares
-                if len(exepath) > 1 and exepath[0] == "\\" and exepath[1] != "\\":
-                    exepath = "\\" + exepath
-            if exepath == mypath:
-                qt = False
-                if "python" in mybin:
-                    # Verify px is the script being run by this instance of Python
-                    if "-m" in p.cmdline() and "px" in p.cmdline():
-                        qt = True
-                    else:
-                        for param in p.cmdline():
-                            if param.endswith("px.py") or param.endswith("px" + ext):
-                                qt = True
-                                break
-                elif is_compiled():
-                    # Binary
-                    qt = True
-                if qt:
-                    count += 1
-                    for child in p.children(recursive=True):
-                        child.kill()
-                    p.kill()
-        except (psutil.AccessDenied, psutil.NoSuchProcess, PermissionError, SystemError):
-            pass
-        except:
-            traceback.print_exc(file=sys.stdout)
+    #     try:
+    #         p = psutil.Process(pid)
+    #         exepath = p.exe().lower()
+    #         if sys.platform == "win32":
+    #             # Set \IP to \\IP for Windows shares
+    #             if len(exepath) > 1 and exepath[0] == "\\" and exepath[1] != "\\":
+    #                 exepath = "\\" + exepath
+    #         if exepath == mypath:
+    #             qt = False
+    #             if "python" in mybin:
+    #                 # Verify px is the script being run by this instance of Python
+    #                 if "-m" in p.cmdline() and "px" in p.cmdline():
+    #                     qt = True
+    #                 else:
+    #                     for param in p.cmdline():
+    #                         if param.endswith("px.py") or param.endswith("px" + ext):
+    #                             qt = True
+    #                             break
+    #             elif is_compiled():
+    #                 # Binary
+    #                 qt = True
+    #             if qt:
+    #                 count += 1
+    #                 for child in p.children(recursive=True):
+    #                     child.kill()
+    #                 p.kill()
+    #     except (psutil.AccessDenied, psutil.NoSuchProcess, PermissionError, SystemError):
+    #         pass
+    #     except:
+    #         traceback.print_exc(file=sys.stdout)
 
-    if count != 0:
-        if checkOnly:
-            pprint(" Failed")
-        else:
-            sys.stdout.write("Quitting Px ..")
-            sys.stdout.flush()
-            time.sleep(4)
-            quit(checkOnly = True)
-    else:
-        if checkOnly:
-            pprint(" DONE")
-        else:
-            pprint("Px is not running")
+    # if count != 0:
+    #     if checkOnly:
+    #         pprint(" Failed")
+    #     else:
+    #         sys.stdout.write("Quitting Px ..")
+    #         sys.stdout.flush()
+    #         time.sleep(4)
+    #         quit(checkOnly = True)
+    # else:
+    #     if checkOnly:
+    #         pprint(" DONE")
+    #     else:
+    #         pprint("Px is not running")
 
-    sys.exit()
+    # sys.exit()
 
 def handle_exceptions(extype, value, tb):
     # Create traceback log
@@ -1046,7 +1046,6 @@ if sys.platform == "win32":
             State.debug.stdout = State.stdout
 
     def attach_console():
-        return
         if ctypes.windll.kernel32.GetConsoleWindow() != 0:
             dprint("Already attached to a console")
             return
