@@ -598,7 +598,6 @@ def set_username(username):
     State.username = username
 
 def set_password():
-    sys.exit()
     # try:
     #     if len(State.username) == 0:
     #         pprint("domain\\username missing - specify via --username or configure in px.ini")
@@ -616,7 +615,7 @@ def set_password():
     # except KeyboardInterrupt:
     #     print("")
 
-    # sys.exit()
+    sys.exit()
 
 def set_pac(pac):
     if pac == "":
@@ -875,7 +874,6 @@ def parse_config():
 # Exit related
 
 def quit(checkOnly = False):
-    sys.exit()
     # return
     # count = 0
     # mypids = [os.getpid(), os.getppid()]
@@ -939,7 +937,7 @@ def quit(checkOnly = False):
     #     else:
     #         pprint("Px is not running")
 
-    # sys.exit()
+    sys.exit()
 
 def handle_exceptions(extype, value, tb):
     # Create traceback log
