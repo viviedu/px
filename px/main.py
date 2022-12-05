@@ -475,7 +475,7 @@ def print_banner():
     # if sys.platform == "win32":
     #     if is_compiled() or "pythonw.exe" in sys.executable:
     #         if State.config.getint("settings", "foreground") == 0:
-                # detach_console()
+    #             detach_console()
 
     for section in State.config.sections():
         for option in State.config.options(section):
@@ -874,7 +874,6 @@ def parse_config():
 # Exit related
 
 def quit(checkOnly = False):
-    # return
     # count = 0
     # mypids = [os.getpid(), os.getppid()]
     # mypath = os.path.realpath(sys.executable).lower()
