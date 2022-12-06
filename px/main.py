@@ -2,7 +2,6 @@
 
 from __future__ import print_function
 
-import basicauth
 import getpass
 import multiprocessing
 import os
@@ -80,6 +79,7 @@ if sys.platform == "win32":
     except ImportError:
         import _winreg as winreg
 
+from . import basicauth
 from . import mcurl
 from . import wproxy
 
