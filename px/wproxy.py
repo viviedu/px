@@ -18,7 +18,7 @@ except ImportError:
     sys.exit()
 
 # PAC processing using quickjs
-from .pac import Pac
+# from .pac import Pac
 
 # Proxy modes - source of proxy info
 MODE_NONE = 0
@@ -242,18 +242,18 @@ class _WproxyBase:
             # Return proxy from environment or configuration
             return copy.deepcopy(self.servers), netloc, path
 
-        if self.mode == MODE_CONFIG_PAC:
-            # Return proxy from configured PAC URL/file
-            if self.pac is None:
-                # Load PAC file
-                self.pac = Pac(debug_print = dprint)
-                if self.servers[0].startswith("http"):
-                    self.pac.load_url(self.servers[0])
-                else:
-                    self.pac.load_jsfile(self.servers[0])
+        # if self.mode == MODE_CONFIG_PAC:
+        #     # Return proxy from configured PAC URL/file
+        #     if self.pac is None:
+        #         # Load PAC file
+        #         self.pac = Pac(debug_print = dprint)
+        #         if self.servers[0].startswith("http"):
+        #             self.pac.load_url(self.servers[0])
+        #         else:
+        #             self.pac.load_jsfile(self.servers[0])
 
-            if self.pac is not None:
-                return parse_proxy(self.pac.find_proxy_for_url(url, netloc[0])), netloc, path
+        #     if self.pac is not None:
+        #         return parse_proxy(self.pac.find_proxy_for_url(url, netloc[0])), netloc, path
 
         return None, netloc, path
 
