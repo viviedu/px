@@ -1,3 +1,5 @@
+# Credit to rdegges/python-basicauth/basicauth.py
+
 """An incredibly simple HTTP basic auth implementation."""
 from base64 import b64decode, b64encode
 from urllib.parse import quote, unquote
