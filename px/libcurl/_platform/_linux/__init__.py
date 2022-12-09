@@ -11,8 +11,9 @@ is_32bit = (sys.maxsize <= 2**32)
 arch     = "x86" if is_32bit else "x64"
 arch_dir = os.path.join(this_dir, arch)
 
-if is_32bit:
-    raise NotImplementedError("This 32 bit OS is not supported already!")
+# We're taking a chance that this will work fine on Linux armhf
+#if is_32bit:
+#    raise NotImplementedError("This 32 bit OS is not supported already!")
 
 # try:
 #     from ...__config__ import config
@@ -21,7 +22,7 @@ if is_32bit:
 #     if DLL_PATH is None or DLL_PATH in ("", "None"):
 #         raise ImportError()
 # except ImportError:
-DLL_PATH = "libcurl.so.4"
+DLL_PATH = "libcurl.so"
 
 from ctypes  import CDLL as DLL
 from _ctypes import dlclose
